@@ -375,6 +375,22 @@ final case class NonEmptyList[+A](head: A, tail: List[A]) {
       case (k, v) => (k, NonEmptyList.fromListUnsafe(v.result))
     } : TreeMap[B, NonEmptyList[A]]
   }
+
+  def contains[AA >: A](a: AA): Boolean = exists(_ == a)
+
+  def collectFirst[B](pf: PartialFunction[A, B]): Option[B] =
+    pf.lift(head).orElse(tail.collectFirst(pf))
+
+  def mkString(s: String): String = mkString("", s, "")
+
+  def mkString(begin: String, s: String, end: String): String = {
+    val builder = new StringBuilder()
+    builder.append(begin)
+    builder.append(head)
+    tail.foreach(elem => builder.append(s"$s$elem"))
+    builder.append(end)
+    builder.toString()
+  }
 }
 
 object NonEmptyList extends NonEmptyListInstances {
